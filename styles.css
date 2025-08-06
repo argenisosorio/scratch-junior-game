@@ -12,7 +12,6 @@
 }
 
 body {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
     background-color: #f0f8ff;
     margin: 0;
     padding: 0;
@@ -52,27 +51,28 @@ header p {
     gap: 15px;
 }
 
+.main-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .blocks-panel {
     width: 100%;
     background-color: #e0e0e0;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     overflow: hidden;
-}
-
-.mobile-menu-btn {
-    display: none;
-    width: 100%;
-    padding: 10px;
-    background-color: var(--dark-color);
-    color: white;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
+    order: 1; /* Mueve los bloques arriba en mobile */
 }
 
 .blocks-content {
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .blocks-panel h3 {
@@ -81,19 +81,23 @@ header p {
     font-size: 1rem;
     border-bottom: 2px solid #bdc3c7;
     padding-bottom: 5px;
+    position: sticky;
+    top: 0;
+    background-color: #e0e0e0;
+    z-index: 1;
 }
 
 .block {
     background-color: var(--primary-color);
     color: white;
     padding: 8px;
-    margin: 6px 0;
     border-radius: 5px;
     cursor: grab;
     text-align: center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     transition: transform 0.1s;
     font-size: 0.9rem;
+    touch-action: none; /* Mejorar arrastre en móviles */
 }
 
 .block-start {
@@ -104,14 +108,8 @@ header p {
     transform: scale(1.02);
 }
 
-.main-area {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
 .stage-area {
-    order: 1;
+    order: 2;
 }
 
 .stage {
@@ -186,13 +184,14 @@ header p {
 }
 
 .scripts-area {
-    order: 2;
+    order: 3;
     width: 100%;
     background-color: #f9f9f9;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     min-height: 150px;
+    margin-top: 10px;
 }
 
 .scripts-area h3 {
@@ -208,11 +207,13 @@ header p {
 }
 
 .output {
+    order: 4;
     background-color: var(--light-color);
     padding: 10px;
     border-radius: 8px;
     min-height: 40px;
     font-size: 0.9rem;
+    margin-top: 15px;
 }
 
 .mission {
@@ -224,6 +225,7 @@ header p {
 /* Estilos para cuando se está arrastrando */
 .dragging {
     opacity: 0.5;
+    transform: scale(1.05);
 }
 
 .drop-zone {
@@ -271,23 +273,37 @@ header p {
     .workspace {
         flex-direction: row;
     }
-    
+
+    .main-area {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
     .blocks-panel {
         width: 250px;
+        order: 0;
     }
-    
-    .main-area {
+
+    .stage-area {
+        flex: 2;
+        order: 1;
+    }
+
+    .scripts-area {
         flex: 1;
+        min-height: 200px;
+        order: 2;
+        margin-top: 0;
     }
-    
+
     .stage {
         height: 300px;
     }
-    
+
     .sprite {
         font-size: 40px;
     }
-    
+
     .food {
         font-size: 30px;
     }
@@ -297,53 +313,54 @@ header p {
     .container {
         padding: 20px;
     }
-    
+
     header h1 {
         font-size: 2rem;
     }
-    
+
     header p {
         font-size: 1.1rem;
     }
-    
+
     .workspace {
         gap: 20px;
     }
-    
+
     .blocks-content {
         padding: 15px;
+        max-height: none;
     }
-    
+
     .blocks-panel h3 {
         font-size: 1.1rem;
     }
-    
+
     .block {
         padding: 10px;
         font-size: 1rem;
     }
-    
+
     .stage {
         height: 350px;
     }
-    
+
     .run-button, .suggestions-button {
         padding: 10px;
         font-size: 1rem;
     }
-    
+
     .scripts-area {
-        min-height: 200px;
+        min-height: 300px;
     }
-    
+
     .scripts-area h3 {
         font-size: 1.1rem;
     }
-    
+
     .output {
         font-size: 1rem;
     }
-    
+
     .mission {
         font-size: 1rem;
     }
@@ -351,45 +368,57 @@ header p {
 
 @media (min-width: 992px) {
     .main-area {
-        flex-direction: row;
+        flex-wrap: nowrap;
     }
     
     .stage-area {
-        flex: 2;
+        order: 1;
     }
-    
+
     .scripts-area {
-        flex: 1;
+        order: 2;
         min-height: 400px;
     }
-    
+
     .stage {
         height: 400px;
     }
 }
 
+/* Estilos específicos para móviles */
 @media (max-width: 599px) {
-    .mobile-menu-btn {
-        display: block;
-    }
-    
     .blocks-content {
-        display: none;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        padding: 10px;
     }
     
-    .blocks-content.show {
-        display: block;
+    .blocks-panel h3 {
+        position: static;
+        width: 100%;
+        text-align: center;
     }
     
-    .sprite {
-        font-size: 35px;
-    }
-    
-    .food {
-        font-size: 30px;
+    .block {
+        min-width: 120px;
+        margin: 0;
     }
     
     .controls {
-        flex-direction: column;
+        flex-direction: row;
+    }
+    
+    /* Mejorar experiencia de arrastre en móviles */
+    .block {
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+    }
+    
+    .scripts-area {
+        min-height: 200px;
     }
 }

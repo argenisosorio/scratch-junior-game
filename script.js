@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Elementos del DOM
     const blocksPanel = document.getElementById('blocks-panel');
     const blocksContent = document.getElementById('blocks-content');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const scriptsArea = document.getElementById('scripts-area');
     const sprite = document.getElementById('sprite');
     const food = document.getElementById('food');
@@ -40,63 +39,143 @@ document.addEventListener('DOMContentLoaded', function() {
         element.style.top = y + 'px';
     }
 
-    // Toggle menú de bloques en móvil
-    mobileMenuBtn.addEventListener('click', function() {
-        blocksContent.classList.toggle('show');
-    });
-
     // Configurar eventos de arrastre para los bloques
     const blocks = document.querySelectorAll('.block, .block-start');
     blocks.forEach(block => {
         block.addEventListener('dragstart', dragStart);
         block.addEventListener('dragend', dragEnd);
+
+        // Eventos táctiles para móviles
+        block.addEventListener('touchstart', handleTouchStart, { passive: false });
+        block.addEventListener('touchmove', handleTouchMove, { passive: false });
+        block.addEventListener('touchend', handleTouchEnd);
     });
     
+    // Variables para manejo táctil
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchElement = null;
+
+    function handleTouchStart(e) {
+        if (isExecuting) {
+            e.preventDefault();
+            return;
+        }
+        touchElement = this;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        dragStart.call(this, e.touches[0]);
+    }
+
+    function handleTouchMove(e) {
+        if (!touchElement || isExecuting) {
+            e.preventDefault();
+            return;
+        }
+
+        // Calcular distancia del movimiento
+        const dx = e.touches[0].clientX - touchStartX;
+        const dy = e.touches[0].clientY - touchStartY;
+
+        // Mover el elemento clonado para el arrastre
+        if (draggedBlock && draggedBlock.clone) {
+            draggedBlock.clone.style.transform = `translate(${dx}px, ${dy}px)`;
+        }
+
+        e.preventDefault();
+    }
+
+    function handleTouchEnd(e) {
+        if (!touchElement || isExecuting) return;
+
+        // Encontrar el área de scripts bajo el dedo
+        const touch = e.changedTouches[0];
+        const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+
+        if (elementUnderTouch && elementUnderTouch.closest('#scripts-area')) {
+            drop.call(scriptsArea, {
+                preventDefault: () => {},
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+        }
+
+        // Limpiar el elemento clonado
+        if (draggedBlock && draggedBlock.clone) {
+            draggedBlock.clone.remove();
+        }
+
+        touchElement = null;
+        dragEnd.call(this);
+    }
+
     // Configurar zonas de soltar
     scriptsArea.addEventListener('dragover', dragOver);
     scriptsArea.addEventListener('dragenter', dragEnter);
     scriptsArea.addEventListener('dragleave', dragLeave);
     scriptsArea.addEventListener('drop', drop);
-    
+
     // Configurar botones
     runBtn.addEventListener('click', executeScripts);
     suggestionsBtn.addEventListener('click', showSuggestions);
-    
+
     // Funciones de arrastre y soltar
     function dragStart(e) {
         if (isExecuting) return;
         draggedBlock = this;
         this.classList.add('dragging');
-        e.dataTransfer.setData('text/plain', this.outerHTML);
-        e.dataTransfer.effectAllowed = 'copy';
+
+        // Para móviles, crear un elemento clonado que siga el dedo
+        if (e instanceof Touch) {
+            const clone = this.cloneNode(true);
+            clone.style.position = 'fixed';
+            clone.style.left = `${touchStartX}px`;
+            clone.style.top = `${touchStartY}px`;
+            clone.style.width = `${this.offsetWidth}px`;
+            clone.style.zIndex = '1000';
+            clone.style.pointerEvents = 'none';
+            clone.style.transform = 'translate(0, 0)';
+            document.body.appendChild(clone);
+            draggedBlock.clone = clone;
+        } else {
+            e.dataTransfer.setData('text/plain', this.outerHTML);
+            e.dataTransfer.effectAllowed = 'copy';
+        }
     }
-    
+
     function dragEnd() {
         this.classList.remove('dragging');
+        if (draggedBlock && draggedBlock.clone) {
+            draggedBlock.clone.remove();
+            draggedBlock.clone = null;
+        }
+        draggedBlock = null;
     }
-    
+
     function dragOver(e) {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
+        if (e.dataTransfer) {
+            e.dataTransfer.dropEffect = 'copy';
+        }
     }
-    
+
     function dragEnter(e) {
         e.preventDefault();
         this.classList.add('drop-zone');
     }
-    
+
     function dragLeave() {
         this.classList.remove('drop-zone');
     }
-    
+
     function drop(e) {
         if (isExecuting) return;
         e.preventDefault();
         this.classList.remove('drop-zone');
-        
+
         const blockType = draggedBlock.getAttribute('data-action');
         const newBlock = createBlockElement(draggedBlock);
-        
+
         if (blockType === 'repeat') {
             const repeatContent = document.createElement('div');
             repeatContent.className = 'repeat-content';
@@ -107,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newBlock.appendChild(repeatContent);
             currentRepeatBlock = repeatContent;
         }
-        
+
         if (currentRepeatBlock && blockType !== 'repeat') {
             currentRepeatBlock.appendChild(newBlock);
         } else {
@@ -115,19 +194,19 @@ document.addEventListener('DOMContentLoaded', function() {
             currentRepeatBlock = null;
         }
     }
-    
+
     // Crear elemento de bloque para el área de scripts
     function createBlockElement(block) {
         const newBlock = document.createElement('div');
         newBlock.className = 'script-block';
-        
+
         const action = block.getAttribute('data-action');
         if (action === 'start') {
             newBlock.classList.add('script-block-start');
         } else if (action === 'repeat') {
             newBlock.classList.add('repeat-block');
         }
-        
+
         newBlock.setAttribute('data-action', action);
         newBlock.setAttribute('data-direction', block.getAttribute('data-direction'));
         newBlock.setAttribute('data-times', block.getAttribute('data-times'));
@@ -135,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const blockContent = block.cloneNode(true);
         blockContent.classList.remove('block', 'block-start', 'dragging');
         newBlock.appendChild(blockContent);
-        
+
         return newBlock;
     }
     
@@ -157,21 +236,21 @@ document.addEventListener('DOMContentLoaded', function() {
             runBtn.disabled = false;
             return;
         }
-        
+
         // Ejecutar cada bloque "start" secuencialmente
         for (const startBlock of startBlocks) {
             if (foodEaten) break;
             await processBlock(startBlock.nextElementSibling);
         }
-        
+
         if (!foodEaten) {
             output.innerHTML += '<div>Programa terminado. ¡El gato no alcanzó el churrasco!</div>';
         }
-        
+
         isExecuting = false;
         runBtn.disabled = false;
     }
-    
+
     // Procesar cada bloque recursivamente
     async function processBlock(block) {
         if (!block || foodEaten) return;
@@ -204,12 +283,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 break;
         }
-        
+
         if (action !== 'repeat' && !foodEaten) {
             await processBlock(block.nextElementSibling);
         }
     }
-    
+
     // Funciones de acciones del sprite
     async function moveSprite(direction) {
         const stage = document.getElementById('stage');
@@ -232,39 +311,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 newLeft = Math.min(stage.offsetWidth - 20, currentLeft + stepSize);
                 break;
         }
-        
+
         sprite.style.left = newLeft + 'px';
         sprite.style.top = newTop + 'px';
-        
+
         await checkProximity();
         await sleep(300);
     }
-    
+
     // Verificar si el gato está cerca del churrasco
     async function checkProximity() {
         const spriteRect = sprite.getBoundingClientRect();
         const foodRect = food.getBoundingClientRect();
-        
+
         const distance = Math.sqrt(
             Math.pow(spriteRect.left - foodRect.left, 2) + 
             Math.pow(spriteRect.top - foodRect.top, 2)
         );
-        
+
         if (distance < 60) {
             output.innerHTML += '<div>¡El gato está cerca del churrasco! 🥩</div>';
         }
     }
-    
+
     // Función para "comer" el churrasco
     async function checkEat() {
         const spriteRect = sprite.getBoundingClientRect();
         const foodRect = food.getBoundingClientRect();
-        
+
         const distance = Math.sqrt(
             Math.pow(spriteRect.left - foodRect.left, 2) + 
             Math.pow(spriteRect.top - foodRect.top, 2)
         );
-        
+
         if (distance < 50) {
             food.style.display = 'none';
             foodEaten = true;
@@ -275,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
             output.innerHTML += '<div>El churrasco está muy lejos. ¡Sigue intentando!</div>';
         }
     }
-    
+
     // Mostrar sugerencias
     function showSuggestions() {
         output.innerHTML = `
@@ -292,10 +371,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-    
+
     // Inicialización
     resetPositions();
-    
+
     // Redimensionar al cambiar tamaño de ventana
     window.addEventListener('resize', function() {
         if (!isExecuting) {

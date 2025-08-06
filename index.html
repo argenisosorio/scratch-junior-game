@@ -14,39 +14,39 @@
         </header>
 
         <div class="workspace">
-            <div class="blocks-panel" id="blocks-panel">
-                <button class="mobile-menu-btn" id="mobile-menu-btn">☰ Bloques</button>
-                <div class="blocks-content" id="blocks-content">
-                    <h3>Bloques de Movimiento</h3>
-                    <div class="block" draggable="true" data-action="move" data-direction="up">
-                        <span>MOVER ARRIBA</span>
-                    </div>
-                    <div class="block" draggable="true" data-action="move" data-direction="down">
-                        <span>MOVER ABAJO</span>
-                    </div>
-                    <div class="block" draggable="true" data-action="move" data-direction="left">
-                        <span>MOVER IZQUIERDA</span>
-                    </div>
-                    <div class="block" draggable="true" data-action="move" data-direction="right">
-                        <span>MOVER DERECHA</span>
-                    </div>
-                    
-                    <h3>Bloques de Acción</h3>
-                    <div class="block" draggable="true" data-action="eat">
-                        <span>COMER CHURRASCO</span>
-                    </div>
-                    
-                    <h3>Bloques de Control</h3>
-                    <div class="block" draggable="true" data-action="repeat" data-times="4">
-                        <span>REPETIR 4 VECES</span>
-                    </div>
-                    <div class="block-start" draggable="true" data-action="start">
-                        <span>AL EMPEZAR A EJECUTAR</span>
+            <!-- Bloques ahora están dentro del main-area para mobile -->
+            <div class="main-area">
+                <div class="blocks-panel" id="blocks-panel">
+                    <div class="blocks-content" id="blocks-content">
+                        <h3>Bloques de Movimiento</h3>
+                        <div class="block" draggable="true" data-action="move" data-direction="up">
+                            <span>MOVER ARRIBA</span>
+                        </div>
+                        <div class="block" draggable="true" data-action="move" data-direction="down">
+                            <span>MOVER ABAJO</span>
+                        </div>
+                        <div class="block" draggable="true" data-action="move" data-direction="left">
+                            <span>MOVER IZQUIERDA</span>
+                        </div>
+                        <div class="block" draggable="true" data-action="move" data-direction="right">
+                            <span>MOVER DERECHA</span>
+                        </div>
+
+                        <h3>Bloques de Acción</h3>
+                        <div class="block" draggable="true" data-action="eat">
+                            <span>COMER CHURRASCO</span>
+                        </div>
+
+                        <h3>Bloques de Control</h3>
+                        <div class="block" draggable="true" data-action="repeat" data-times="4">
+                            <span>REPETIR 4 VECES</span>
+                        </div>
+                        <div class="block-start" draggable="true" data-action="start">
+                            <span>AL EMPEZAR A EJECUTAR</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="main-area">
                 <div class="stage-area">
                     <div class="stage" id="stage">
                         <div class="sprite" id="sprite">🐱</div>
