@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch Junior - Mueve al gato al churrasco</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Scratch Junior</h1>
+            <p>¡Ayuda al gatito a llegar al churrasco! 🐱→🥩</p>
+        </header>
+
+        <div class="workspace">
+            <div class="blocks-panel" id="blocks-panel">
+                <button class="mobile-menu-btn" id="mobile-menu-btn">☰ Bloques</button>
+                <div class="blocks-content" id="blocks-content">
+                    <h3>Bloques de Movimiento</h3>
+                    <div class="block" draggable="true" data-action="move" data-direction="up">
+                        <span>MOVER ARRIBA</span>
+                    </div>
+                    <div class="block" draggable="true" data-action="move" data-direction="down">
+                        <span>MOVER ABAJO</span>
+                    </div>
+                    <div class="block" draggable="true" data-action="move" data-direction="left">
+                        <span>MOVER IZQUIERDA</span>
+                    </div>
+                    <div class="block" draggable="true" data-action="move" data-direction="right">
+                        <span>MOVER DERECHA</span>
+                    </div>
+                    
+                    <h3>Bloques de Acción</h3>
+                    <div class="block" draggable="true" data-action="eat">
+                        <span>COMER CHURRASCO</span>
+                    </div>
+                    
+                    <h3>Bloques de Control</h3>
+                    <div class="block" draggable="true" data-action="repeat" data-times="4">
+                        <span>REPETIR 4 VECES</span>
+                    </div>
+                    <div class="block-start" draggable="true" data-action="start">
+                        <span>AL EMPEZAR A EJECUTAR</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="stage-area">
+                    <div class="stage" id="stage">
+                        <div class="sprite" id="sprite">🐱</div>
+                        <div class="food" id="food">🥩</div>
+                    </div>
+                    <div class="controls">
+                        <div class="suggestions-button" id="suggestions-btn">SUGERENCIAS</div>
+                        <div class="run-button" id="run-btn">EJECUTAR</div>
+                    </div>
+                </div>
+
+                <div class="scripts-area" id="scripts-area">
+                    <h3>Área de Programación</h3>
+                    <p>Arrastra los bloques aquí para crear tu programa</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="output" id="output">
+            <div class="mission">Misión: Haz que el gato llegue al churrasco 🥩 usando los bloques de movimiento</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
